@@ -134,7 +134,7 @@ func answer(w http.ResponseWriter, r *http.Request) {
 	if value := r.Header.Get("Content-Type"); value != "application/json" {
 		msg := fmt.Sprintf("Invalid Content-Type, should be application/json")
 		http.Error(w, msg, http.StatusBadRequest)
-	} else if r.Method == "PUT" || r.Method == "POST" {
+	} else if r.Method == "PUT" || r.Method == "POST" || r.Method == "VIEW" {
 		// send
 		corrId := randomString(32)
 		text, _ := ioutil.ReadAll(r.Body)
