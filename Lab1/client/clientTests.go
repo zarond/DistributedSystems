@@ -35,6 +35,7 @@ type XMLEntry struct {
 var OUT []XMLEntry
 
 func main() {
+	time.Sleep(time.Minute)
 	//flag.Parse()
 	//log.SetFlags(log.LstdFlags)
 	samples = [16]msg{{"a", "A"}, {"b", "B"}, {"c", "C"}, {"one", "ValueOne"}, {"two", "ValueTwo"}, {"three", "ValueTree"}, {"qwertyuiop[]", "QWERTYUIOP{}"}, {"asdfghjkl;'\\", "ASDFGHJKL:\"\\"},
