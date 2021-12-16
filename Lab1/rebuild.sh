@@ -24,14 +24,38 @@ docker run -d --restart=unless-stopped --name stats stats:latest
 
 # wait until all running
 
-until  [ "`docker inspect -f '{{.State.Running}}{{.State.Restarting}}' redis-main`"=="truefalse" ] \
-    && [ "`docker inspect -f '{{.State.Running}}{{.State.Restarting}}' worker1`"=="truefalse" ] \
-    && [ "`docker inspect -f '{{.State.Running}}{{.State.Restarting}}' worker2`"=="truefalse" ] \
-    && [ "`docker inspect -f '{{.State.Running}}{{.State.Restarting}}' gateway`"=="truefalse" ] \
-    && [ "`docker inspect -f '{{.State.Running}}{{.State.Restarting}}' stats`"=="truefalse" ]; do
+until  [ "`docker inspect -f {{.State.Running}}{{.State.Restarting}} redis-main`"=="truefalse" ] \
+    && [ "`docker inspect -f {{.State.Running}}{{.State.Restarting}} worker1`"=="truefalse" ] \
+    && [ "`docker inspect -f {{.State.Running}}{{.State.Restarting}} worker2`"=="truefalse" ] \
+    && [ "`docker inspect -f {{.State.Running}}{{.State.Restarting}} gateway`"=="truefalse" ] \
+    && [ "`docker inspect -f {{.State.Running}}{{.State.Restarting}} stats`"=="truefalse" ] 
+do
     echo wait
-    sleep 1
+    sleep 5
 done
 
-#echo dockerReady
+sleep 5
+
+for i in 0 1 2 3 4 5
+do
+    until  [ "`docker inspect -f {{.State.Running}} redis-main`"=="true" ] \
+        && [ "`docker inspect -f {{.State.Running}} worker1`"=="true" ] \
+        && [ "`docker inspect -f {{.State.Running}} worker2`"=="true" ] \
+        && [ "`docker inspect -f {{.State.Running}} gateway`"=="true" ] \
+        && [ "`docker inspect -f {{.State.Running}} stats`"=="true" ] \
+        && [ "`docker inspect -f {{.State.Restarting}} redis-main`"=="false" ] \
+        && [ "`docker inspect -f {{.State.Restarting}} worker1`"=="false" ] \
+        && [ "`docker inspect -f {{.State.Restarting}} worker2`"=="false" ] \
+        && [ "`docker inspect -f {{.State.Restarting}} gateway`"=="false" ] \
+        && [ "`docker inspect -f {{.State.Restarting}} stats`"=="false" ] 
+    do
+        echo wait
+        sleep 5
+    done
+
+sleep 1
+
+done
+
+echo dockerReady
 #sleep 30
