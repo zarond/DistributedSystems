@@ -18,8 +18,10 @@ build_script:
   
 test_script:
   - echo Test step
+  - cd Lab1
   - cd client
   - go run clientTests.go
+  - cd ..
   - cd ..
   
 on_success:
