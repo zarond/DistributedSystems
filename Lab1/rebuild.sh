@@ -15,7 +15,7 @@ cd ..
 docker run -d --name redis-main --restart=unless-stopped -p 6379:6379 redis:latest
 docker run -d -p 5672:5672 --name messagebrocker rabbitmq:latest
 
-sleep 10
+#sleep 10
 
 docker run -d -p 8080:8080 --restart=unless-stopped --name gateway gateway:latest
 docker run -d -e "FLAGS= --redis 172.17.0.1:6379" --restart=unless-stopped --name worker1 worker:latest
@@ -29,8 +29,9 @@ until  [ "`docker inspect -f '{{.State.Running}}{{.State.Restarting}}' redis-mai
     && [ "`docker inspect -f '{{.State.Running}}{{.State.Restarting}}' worker2`"=="truefalse" ] \
     && [ "`docker inspect -f '{{.State.Running}}{{.State.Restarting}}' gateway`"=="truefalse" ] \
     && [ "`docker inspect -f '{{.State.Running}}{{.State.Restarting}}' stats`"=="truefalse" ]; do
-    sleep 1;
-done;
+    echo wait
+    sleep 1
+done
 
 #echo dockerReady
 #sleep 30
