@@ -1,0 +1,24 @@
+version: 1.0.{build}
+image: Visual Studio 2019
+
+max_jobs: 1
+
+init:
+  - echo Init step
+  
+install:
+  - echo Install step
+
+build_script:
+  - echo Build step
+  # - sh : ./Lab1/rebuild.sh
+  
+test_script:
+  - echo Test step
+  # - sh : ./
+  
+on_success:
+  - echo SUCCESS
+  
+on_failure:
+  - echo EPIC FAIL
