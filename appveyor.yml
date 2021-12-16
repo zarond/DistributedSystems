@@ -21,7 +21,7 @@ test_script:
   - docker ps -a
   - cd Lab1
   - cd client
-  - go run clientTests.go
+  #- go run clientTests.go
   - sleep 30
   - go run clientTests.go
   - cd ..
