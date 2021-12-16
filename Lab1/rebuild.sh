@@ -33,4 +33,4 @@ until  [ "`docker inspect -f '{{.State.Running}}{{.State.Restarting}}' redis-mai
 done;
 
 #echo dockerReady
-
+sleep 30
