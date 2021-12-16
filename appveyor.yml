@@ -18,6 +18,7 @@ build_script:
   
 test_script:
   - echo Test step
+  - docker ps -a
   - cd Lab1
   - cd client
   - go run clientTests.go
