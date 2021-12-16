@@ -6,6 +6,7 @@ import (
 	//"fmt"
 	"io"
 	"math/rand"
+	"os"
 	"strings"
 	"sync"
 
@@ -19,10 +20,19 @@ import (
 	"log"
 
 	"encoding/json"
-	//"fmt"
 	"net/http"
 	"time"
+	//"encoding/xml"
 )
+
+var numberoferrors int
+
+type XMLEntry struct {
+	mes string
+	err error
+}
+
+var OUT []XMLEntry
 
 func main() {
 	//flag.Parse()
@@ -43,6 +53,12 @@ func main() {
 	//start( /*ctx*/ )
 	wg.Wait()
 	log.Println("All test done")
+	writeAllOK()
+	if numberoferrors == 0 {
+		os.Exit(0)
+	} else {
+		os.Exit(1)
+	}
 	// make graceful close
 	/*
 		interrupt := make(chan os.Signal, 1)
@@ -57,18 +73,19 @@ func start( /*ctx context.Context*/ ) {
 	//log.Println("`listening on localhost:8080")
 	//log.Fatal(http.ListenAndServe(":8080", nil))
 	client := &http.Client{}
+	client.Timeout = time.Second
 	for i := 0; i < 16; i++ { // save
 		message := samples[i]
 		data, _ := json.Marshal(message)
 		req, err := http.NewRequest("POST", "http://127.0.0.1:8080", strings.NewReader(string(data)))
 		if err != nil {
-			log.Println("error creating request", err)
+			Fail("error creating request", err)
 			continue
 		}
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := client.Do(req)
 		if err != nil {
-			log.Println("error sending request", err)
+			Fail("error sending request", err)
 			continue
 		}
 		defer resp.Body.Close()
@@ -78,9 +95,9 @@ func start( /*ctx context.Context*/ ) {
 		err = json.Unmarshal(body, &messageGet)
 		if err != nil || status != 200 {
 			if err != nil {
-				log.Println("error response", err)
+				Fail("error response", err)
 			} else {
-				log.Println("error response")
+				Fail("error response", nil)
 			}
 		} else {
 			log.Println(i, " OK")
@@ -93,13 +110,13 @@ func start( /*ctx context.Context*/ ) {
 		data, _ := json.Marshal(message)
 		req, err := http.NewRequest("PUT", "http://127.0.0.1:8080", strings.NewReader(string(data)))
 		if err != nil {
-			log.Println("error creating request", err)
+			Fail("error creating request", err)
 			continue
 		}
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := client.Do(req)
 		if err != nil {
-			log.Println("error sending request", err)
+			Fail("error sending request", err)
 			continue
 		}
 		defer resp.Body.Close()
@@ -109,9 +126,9 @@ func start( /*ctx context.Context*/ ) {
 		err = json.Unmarshal(body, &messageGet)
 		if err != nil || status != 200 || messageGet.Value != realValue {
 			if err != nil {
-				log.Println("error response", err)
+				Fail("error response", err)
 			} else {
-				log.Println("error response")
+				Fail("error response", nil)
 			}
 		} else {
 			log.Println(i, " OK")
@@ -124,13 +141,13 @@ func start( /*ctx context.Context*/ ) {
 		data, _ := json.Marshal(message)
 		req, err := http.NewRequest("POST", "http://127.0.0.1:8080", strings.NewReader(string(data)))
 		if err != nil {
-			log.Println("error creating request", err)
+			Fail("error creating request", err)
 			continue
 		}
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := client.Do(req)
 		if err != nil {
-			log.Println("error sending request", err)
+			Fail("error sending request", err)
 			continue
 		}
 		defer resp.Body.Close()
@@ -140,9 +157,9 @@ func start( /*ctx context.Context*/ ) {
 		err = json.Unmarshal(body, &messageGet)
 		if err != nil || status != 200 {
 			if err != nil {
-				log.Println("error response", err)
+				Fail("error response", err)
 			} else {
-				log.Println("error response")
+				Fail("error response", nil)
 			}
 		} else {
 			log.Println(i, " OK")
@@ -156,13 +173,13 @@ func start( /*ctx context.Context*/ ) {
 		data, _ := json.Marshal(message)
 		req, err := http.NewRequest("PUT", "http://127.0.0.1:8080", strings.NewReader(string(data)))
 		if err != nil {
-			log.Println("error creating request", err)
+			Fail("error creating request", err)
 			continue
 		}
 		req.Header.Set("Content-Type", "application/json")
 		resp, err := client.Do(req)
 		if err != nil {
-			log.Println("error sending request", err)
+			Fail("error sending request", err)
 			continue
 		}
 		defer resp.Body.Close()
@@ -172,9 +189,9 @@ func start( /*ctx context.Context*/ ) {
 		err = json.Unmarshal(body, &messageGet)
 		if err != nil || status != 200 || messageGet.Value != realValue {
 			if err != nil {
-				log.Println("error response", err)
+				Fail("error response", err)
 			} else {
-				log.Println("error response")
+				Fail("error response", nil)
 			}
 		} else {
 			log.Println(i, " OK")
@@ -196,4 +213,28 @@ func randomString(l int) string {
 		bytes[i] = byte(65 + rand.Intn(25))
 	}
 	return string(bytes)
+}
+
+func writeXML() {
+
+}
+
+func writeAllOK() {
+	if numberoferrors == 0 {
+		OUT = append(OUT, XMLEntry{"ALL TEST PASSED", nil})
+	}
+}
+
+func writeError(mes string, err error) {
+	OUT = append(OUT, XMLEntry{mes, err})
+}
+
+func Fail(mes string, err error) {
+	log.Println(mes, err)
+	numberoferrors += 1
+	writeError(mes, err)
+	if numberoferrors > 50 {
+		log.Println("Too many errors, aborting")
+		os.Exit(1)
+	}
 }

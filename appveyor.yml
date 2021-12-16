@@ -12,12 +12,15 @@ install:
 build_script:
   - echo Build step
   - cd Lab1
-  # - sh : rebuild.sh
+  - sh : rebuild.sh
+  - #sleep 10
   - cd ..
   
 test_script:
   - echo Test step
-  # - sh : ./
+  - cd client
+  - go run clientTests.go
+  - cd ..
   
 on_success:
   - echo SUCCESS
