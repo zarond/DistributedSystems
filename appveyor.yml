@@ -22,6 +22,8 @@ test_script:
   - cd Lab1
   - cd client
   - go run clientTests.go
+  - sleep 30
+  - go run clientTests.go
   - cd ..
   - cd ..
   
