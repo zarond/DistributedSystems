@@ -12,7 +12,7 @@ install:
 build_script:
   - echo Build step
   - cd Lab1
-  - sh : rebuild.sh
+  - sh rebuild.sh
   - #sleep 10
   - cd ..
   
