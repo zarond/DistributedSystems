@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"log"
 	"sort"
+	"time"
 
 	"encoding/json"
 	//"fmt"
@@ -59,12 +60,25 @@ type jsonArr struct {
 }
 
 func main() {
+
+RESTART:
+
 	conn, err := amqp.Dial("amqp://guest:guest@172.17.0.1:5672/")
-	failOnError(err, "Failed to connect to RabbitMQ")
+	//failOnError(err, "Failed to connect to RabbitMQ")
+	if err != nil {
+		log.Println("%s: %s", "Failed to connect to RabbitMQ", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 	defer conn.Close()
 
 	ChannelInfo, err = conn.Channel()
-	failOnError(err, "Failed to open channel")
+	//failOnError(err, "Failed to open channel")
+	if err != nil {
+		log.Println("%s: %s", "Failed to open channel", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 	defer ChannelInfo.Close()
 
 	QueueInfo, err = ChannelInfo.QueueDeclare(
@@ -75,7 +89,12 @@ func main() {
 		false,       // no-wait
 		nil,         // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
+	//failOnError(err, "Failed to declare a queue")
+	if err != nil {
+		log.Println("%s: %s", "Failed to declare a queue", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 
 	QueueInfoReply, err = ChannelInfo.QueueDeclare(
 		"stat_info_reply", // name
@@ -85,7 +104,12 @@ func main() {
 		false,             // no-wait
 		nil,               // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
+	//failOnError(err, "Failed to declare a queue")
+	if err != nil {
+		log.Println("%s: %s", "Failed to declare a queue", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 
 	msgs, err = ChannelInfo.Consume(
 		QueueInfo.Name, // queue
@@ -96,7 +120,12 @@ func main() {
 		false,          // no-wait
 		nil,            // args
 	)
-	failOnError(err, "Failed to register a consumer")
+	//failOnError(err, "Failed to register a consumer")
+	if err != nil {
+		log.Println("%s: %s", "Failed to declare a queue", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 
 	//msgsInner = make(chan stat_entry, 16)
 	stats = make(map[string]int)

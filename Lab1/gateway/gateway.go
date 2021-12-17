@@ -4,6 +4,8 @@ import (
 	//"context"
 	//"flag"
 	"fmt"
+	"time"
+
 	//"os/exec"
 	"math/rand"
 
@@ -34,17 +36,37 @@ func failOnError(err error, msg string) {
 	}
 }
 
+//func failRestart(err error, msg string) {
+//	if err != nil {
+//		log.Println("%s: %s", msg, err)
+//		time.Sleep(5 * time.Second)
+//		goto RESTART
+//	}
+//}
+
 func main() {
 	//flag.Parse()
 	//log.SetFlags(log.LstdFlags)
 
+RESTART:
+
 	//conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	conn, err := amqp.Dial("amqp://guest:guest@172.17.0.1:5672/")
-	failOnError(err, "Failed to connect to RabbitMQ")
+	//failOnError(err, "Failed to connect to RabbitMQ")
+	if err != nil {
+		log.Println("%s: %s", "Failed to connect to RabbitMQ", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 	defer conn.Close()
 
 	ChannelRequest, err = conn.Channel()
-	failOnError(err, "Failed to open channel")
+	//failOnError(err, "Failed to open channel")
+	if err != nil {
+		log.Println("%s: %s", "Failed to open channel", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 	defer ChannelRequest.Close()
 
 	QueueRequest, err = ChannelRequest.QueueDeclare(
@@ -55,7 +77,12 @@ func main() {
 		false,            // no-wait
 		nil,              // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
+	//failOnError(err, "Failed to declare a queue")
+	if err != nil {
+		log.Println("%s: %s", "Failed to declare a queue", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 
 	QueueResponse, err = ChannelRequest.QueueDeclare(
 		"tasks_responses", // name
@@ -65,7 +92,12 @@ func main() {
 		false,             // no-wait
 		nil,               // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
+	//failOnError(err, "Failed to declare a queue")
+	if err != nil {
+		log.Println("%s: %s", "Failed to declare a queue", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 
 	msgs, err = ChannelRequest.Consume(
 		QueueResponse.Name, // queue
@@ -76,7 +108,12 @@ func main() {
 		false,              // no-wait
 		nil,                // args
 	)
-	failOnError(err, "Failed to register a consumer")
+	//failOnError(err, "Failed to register a consumer")
+	if err != nil {
+		log.Println("%s: %s", "Failed to register a consumer", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 
 	msgsInner = make(chan reply_msg, 16)
 	go listen_for_replies()

@@ -53,6 +53,7 @@ func main() {
 
 	//ctx, cancel := context.WithCancel(context.Background())
 	//defer cancel()
+RESTART:
 
 	RedisClient = redis.NewClient(&redis.Options{
 		Addr:     *redisaddr,
@@ -60,19 +61,34 @@ func main() {
 		DB:       *redisdb,
 	})
 	_, err = RedisClient.Ping().Result()
+	//if err != nil {
+	//	log.Panicf("Redis connection err: %s", err)
+	//}
 	if err != nil {
-		log.Panicf("Redis connection err: %s", err)
+		log.Println("%s: %s", "Redis connection err:", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
 	}
 	defer RedisClient.Close()
 
 	//conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	conn, err := amqp.Dial("amqp://guest:guest@172.17.0.1:5672/")
 
-	failOnError(err, "Failed to connect to RabbitMQ")
+	//failOnError(err, "Failed to connect to RabbitMQ")
+	if err != nil {
+		log.Println("%s: %s", "Failed to connect to RabbitMQ", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 	defer conn.Close()
 
 	ChannelRequest, err = conn.Channel()
-	failOnError(err, "Failed to open channel")
+	//failOnError(err, "Failed to open channel")
+	if err != nil {
+		log.Println("%s: %s", "Failed to open channel", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 	defer ChannelRequest.Close()
 
 	QueueRequest, err = ChannelRequest.QueueDeclare(
@@ -83,7 +99,12 @@ func main() {
 		false,            // no-wait
 		nil,              // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
+	//failOnError(err, "Failed to declare a queue")
+	if err != nil {
+		log.Println("%s: %s", "Failed to declare a queue", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 
 	QueueResponse, err = ChannelRequest.QueueDeclare(
 		"tasks_responses", // name
@@ -93,7 +114,12 @@ func main() {
 		false,             // no-wait
 		nil,               // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
+	//failOnError(err, "Failed to declare a queue")
+	if err != nil {
+		log.Println("%s: %s", "Failed to declare a queue", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 
 	QueueInfo, err = ChannelRequest.QueueDeclare(
 		"stat_info", // name
@@ -103,7 +129,12 @@ func main() {
 		false,       // no-wait
 		nil,         // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
+	//failOnError(err, "Failed to declare a queue")
+	if err != nil {
+		log.Println("%s: %s", "Failed to declare a queue", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 
 	QueueInfoReply, err = ChannelRequest.QueueDeclare(
 		"stat_info_reply", // name
@@ -113,7 +144,12 @@ func main() {
 		false,             // no-wait
 		nil,               // arguments
 	)
-	failOnError(err, "Failed to declare a queue")
+	//failOnError(err, "Failed to declare a queue")
+	if err != nil {
+		log.Println("%s: %s", "Failed to declare a queue", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 
 	msgs, err = ChannelRequest.Consume(
 		QueueRequest.Name, // queue
@@ -124,7 +160,12 @@ func main() {
 		false,             // no-wait
 		nil,               // args
 	)
-	failOnError(err, "Failed to register a consumer")
+	//failOnError(err, "Failed to register a consumer")
+	if err != nil {
+		log.Println("%s: %s", "Failed to register a consumer", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 
 	StatsMessages, err = ChannelRequest.Consume(
 		QueueInfoReply.Name, // queue
@@ -135,7 +176,12 @@ func main() {
 		false,               // no-wait
 		nil,                 // args
 	)
-	failOnError(err, "Failed to register a consumer")
+	//failOnError(err, "Failed to register a consumer")
+	if err != nil {
+		log.Println("%s: %s", "Failed to register a consumer", err)
+		time.Sleep(5 * time.Second)
+		goto RESTART
+	}
 
 	/*
 		go func() {
