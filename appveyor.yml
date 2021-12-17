@@ -14,18 +14,18 @@ build_script:
   - cd Lab1
   - chmod +x rebuild.sh
   - sh : ./rebuild.sh
-  - sleep 10
+  #- sleep 10
   - cd ..
   
 test_script:
   - echo Test step
-  - docker ps -a
+  #- docker ps -a
   - cd Lab1
   - cd autotests
   #- go run clientTests.go
-  - sleep 30
-  - docker ps -a
-  - sleep 30
+  #- sleep 30
+  #- docker ps -a
+  #- sleep 30
   - docker ps -a
   - go run clientTests.go
   - cd ..

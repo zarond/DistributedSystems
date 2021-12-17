@@ -36,26 +36,26 @@ done
 
 sleep 5
 
-for i in 0 1 2 3 4 5
-do
-    until  [ "`docker inspect -f {{.State.Running}} redis-main`"=="true" ] \
-        && [ "`docker inspect -f {{.State.Running}} worker1`"=="true" ] \
-        && [ "`docker inspect -f {{.State.Running}} worker2`"=="true" ] \
-        && [ "`docker inspect -f {{.State.Running}} gateway`"=="true" ] \
-        && [ "`docker inspect -f {{.State.Running}} stats`"=="true" ] \
-        && [ "`docker inspect -f {{.State.Restarting}} redis-main`"=="false" ] \
-        && [ "`docker inspect -f {{.State.Restarting}} worker1`"=="false" ] \
-        && [ "`docker inspect -f {{.State.Restarting}} worker2`"=="false" ] \
-        && [ "`docker inspect -f {{.State.Restarting}} gateway`"=="false" ] \
-        && [ "`docker inspect -f {{.State.Restarting}} stats`"=="false" ] 
-    do
-        echo wait
-        sleep 5
-    done
-
-sleep 1
-
-done
+#for i in 0 1 2 3 4 5
+#do
+#    until  [ "`docker inspect -f {{.State.Running}} redis-main`"=="true" ] \
+#        && [ "`docker inspect -f {{.State.Running}} worker1`"=="true" ] \
+#        && [ "`docker inspect -f {{.State.Running}} worker2`"=="true" ] \
+#        && [ "`docker inspect -f {{.State.Running}} gateway`"=="true" ] \
+#        && [ "`docker inspect -f {{.State.Running}} stats`"=="true" ] \
+#        && [ "`docker inspect -f {{.State.Restarting}} redis-main`"=="false" ] \
+#        && [ "`docker inspect -f {{.State.Restarting}} worker1`"=="false" ] \
+#        && [ "`docker inspect -f {{.State.Restarting}} worker2`"=="false" ] \
+#        && [ "`docker inspect -f {{.State.Restarting}} gateway`"=="false" ] \
+#        && [ "`docker inspect -f {{.State.Restarting}} stats`"=="false" ] 
+#    do
+#        echo wait
+#        sleep 5
+#    done
+#
+#sleep 1
+#
+#done
 
 echo dockerReady
 #sleep 30
