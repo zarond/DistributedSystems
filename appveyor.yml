@@ -23,7 +23,7 @@ test_script:
   - cd Lab1
   - cd autotests
   #- go run clientTests.go
-  #- sleep 30
+  - sleep 30
   #- docker ps -a
   #- sleep 30
   - docker ps -a
