@@ -20,7 +20,7 @@ test_script:
   - echo Test step
   - docker ps -a
   - cd Lab1
-  - cd client
+  - cd autotests
   #- go run clientTests.go
   - sleep 30
   - docker ps -a
