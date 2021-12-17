@@ -1,5 +1,5 @@
 version: 1.0.{build}
-image: macos #Ubuntu
+image: Ubuntu
 
 max_jobs: 1
 
@@ -12,7 +12,8 @@ install:
 build_script:
   - echo Build step
   - cd Lab1
-  - sh rebuild.sh
+  - chmod +x rebuild.sh
+  - sh : ./rebuild.sh
   - sleep 10
   - cd ..
   
@@ -36,3 +37,7 @@ on_success:
 on_failure:
   - docker ps -a
   - echo EPIC FAIL
+
+on_finish:
+  - sh: export APPVEYOR_VNC_BLOCK=true
+  - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-vnc.sh' | bash -e -
